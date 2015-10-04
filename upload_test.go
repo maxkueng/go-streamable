@@ -17,7 +17,7 @@ func Test_Upload(t *testing.T) {
 	assert.NotZero(t, res)
 }
 
-func Test_Upload_UsernamePassword(t *testing.T) {
+func Test_UploadAuthenticated_UsernamePassword(t *testing.T) {
 	var testFile = path.Join(testFilesDir, "cat-video.mp4")
 
 	creds := Credentials{
