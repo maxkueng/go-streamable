@@ -2,7 +2,6 @@ package streamable
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -69,13 +68,14 @@ func upload(creds Credentials, filePath string) (VideoResponse, error) {
 		return VideoResponse{}, fmt.Errorf("upload failed")
 	}
 
-	jsonRes, err := ioutil.ReadAll(res.Body)
+	bodyBytes, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return VideoResponse{}, err
 	}
 
-	videoRes := VideoResponse{}
-	err = json.Unmarshal(jsonRes, &videoRes)
+	body := bytesToString(bodyBytes)
+
+	videoRes, err := videoResponseFromJson(body)
 	if err != nil {
 		return VideoResponse{}, err
 	}
