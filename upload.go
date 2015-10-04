@@ -22,6 +22,10 @@ func UploadAuthenticated(creds Credentials, filePath string) (VideoResponse, err
 }
 
 func upload(creds Credentials, filePath string) (VideoResponse, error) {
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		return VideoResponse{}, err
+	}
+
 	var buf bytes.Buffer
 
 	multipartWriter := multipart.NewWriter(&buf)
@@ -56,6 +60,7 @@ func upload(creds Credentials, filePath string) (VideoResponse, error) {
 
 	client := &http.Client{}
 	res, err := client.Do(req)
+	defer res.Body.Close()
 	if err != nil {
 		return VideoResponse{}, err
 	}
@@ -65,7 +70,6 @@ func upload(creds Credentials, filePath string) (VideoResponse, error) {
 	}
 
 	jsonRes, err := ioutil.ReadAll(res.Body)
-	res.Body.Close()
 	if err != nil {
 		return VideoResponse{}, err
 	}
