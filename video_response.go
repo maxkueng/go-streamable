@@ -1,5 +1,7 @@
 package streamable
 
+import "encoding/json"
+
 const (
 	StatusUploading   = 0
 	StatusProcessing  = 1
@@ -22,4 +24,14 @@ type VideoResponseFile struct {
 	Url    string `json:"url"`
 	Width  int    `json:"width"`
 	Height int    `json:"height"`
+}
+
+func videoResponseFromJson(jsonStr string) (VideoResponse, error) {
+	res := VideoResponse{}
+	parseErr := json.Unmarshal([]byte(jsonStr), &res)
+	if parseErr != nil {
+		return VideoResponse{}, parseErr
+	}
+
+	return res, nil
 }
