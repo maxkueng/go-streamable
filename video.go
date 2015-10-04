@@ -40,6 +40,10 @@ func video(creds Credentials, shortcode string) (VideoResponse, error) {
 	}
 
 	bodyBytes, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return VideoResponse{}, err
+	}
+
 	body := bytesToString(bodyBytes)
 
 	videoRes, err := videoResponseFromJson(body)
