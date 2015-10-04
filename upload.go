@@ -12,15 +12,15 @@ import (
 
 const uploadUrl string = apiUrl + "/upload"
 
-func Upload(filePath string) (VideoResponse, error) {
-	return upload(Credentials{}, filePath)
+func UploadVideo(filePath string) (VideoResponse, error) {
+	return uploadVideo(Credentials{}, filePath)
 }
 
-func UploadAuthenticated(creds Credentials, filePath string) (VideoResponse, error) {
-	return upload(creds, filePath)
+func UploadVideoAuthenticated(creds Credentials, filePath string) (VideoResponse, error) {
+	return uploadVideo(creds, filePath)
 }
 
-func upload(creds Credentials, filePath string) (VideoResponse, error) {
+func uploadVideo(creds Credentials, filePath string) (VideoResponse, error) {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return VideoResponse{}, err
 	}

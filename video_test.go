@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Video(t *testing.T) {
-	res, err := Video("ifjh")
+func Test_GetVideo(t *testing.T) {
+	res, err := GetVideo("ifjh")
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
@@ -38,7 +38,7 @@ func Test_Video(t *testing.T) {
 	assert.Equal(t, expectedWebm, res.Files["webm"])
 }
 
-func Test_VideoAuthenticated_UsernamePassword(t *testing.T) {
+func Test_GetVideoAuthenticated_UsernamePassword(t *testing.T) {
 	if os.Getenv("STREAMABLE_USERNAME") == "" || os.Getenv("STREAMABLE_PASSWORD") == "" {
 		t.Skip("skipping test; $STREAMABLE_USERNAME or $STREAMABLE_PASSWORD not set")
 	}
@@ -48,7 +48,7 @@ func Test_VideoAuthenticated_UsernamePassword(t *testing.T) {
 		Password: os.Getenv("STREAMABLE_PASSWORD"),
 	}
 
-	res, err := VideoAuthenticated(creds, "ifjh")
+	res, err := GetVideoAuthenticated(creds, "ifjh")
 
 	assert.Nil(t, err)
 	assert.NotNil(t, res)

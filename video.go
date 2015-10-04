@@ -9,15 +9,15 @@ import (
 
 const videoUrl string = apiUrl + "/videos"
 
-func Video(shortcode string) (VideoResponse, error) {
-	return video(Credentials{}, shortcode)
+func GetVideo(shortcode string) (VideoResponse, error) {
+	return getVideo(Credentials{}, shortcode)
 }
 
-func VideoAuthenticated(creds Credentials, shortcode string) (VideoResponse, error) {
-	return video(creds, shortcode)
+func GetVideoAuthenticated(creds Credentials, shortcode string) (VideoResponse, error) {
+	return getVideo(creds, shortcode)
 }
 
-func video(creds Credentials, shortcode string) (VideoResponse, error) {
+func getVideo(creds Credentials, shortcode string) (VideoResponse, error) {
 	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", getVideoUrl(shortcode), nil)

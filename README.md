@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-  res, _ := streamable.Upload("selfie.mp4")
+  res, _ := streamable.UploadVideo("selfie.mp4")
 
   fmt.Printf("%s\n", res.Shortcode);
 }
@@ -34,7 +34,7 @@ func main() {
     Password: "secret",
   }
 
-  res, _ := streamable.UploadAuthenticated(creds, "selfie.mp4")
+  res, _ := streamable.UploadVideoAuthenticated(creds, "selfie.mp4")
 
   fmt.Printf("%s\n", res.Shortcode);
 }
