@@ -1,6 +1,8 @@
 go-streamable
 =============
 
+[![Build Status](https://travis-ci.org/maxkueng/go-streamable.svg)](https://travis-ci.org/maxkueng/go-streamable)
+
 A Go client library for [streamable.com](https://streamable.com/).
 
 WIP!
