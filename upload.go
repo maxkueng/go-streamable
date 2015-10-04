@@ -48,6 +48,10 @@ func upload(creds Credentials, filePath string) (VideoResponse, error) {
 		return VideoResponse{}, err
 	}
 
+	if creds.Username != "" && creds.Password != "" {
+		req.SetBasicAuth(creds.Username, creds.Password)
+	}
+
 	req.Header.Set("Content-Type", multipartWriter.FormDataContentType())
 
 	client := &http.Client{}
