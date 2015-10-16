@@ -14,10 +14,10 @@ import (
 )
 
 const (
-	apiUrl    string = "https://api.streamable.com"
-	importUrl string = apiUrl + "/import"
-	uploadUrl string = apiUrl + "/upload"
-	videoUrl  string = apiUrl + "/videos"
+	apiURL    string = "https://api.streamable.com"
+	importURL string = apiURL + "/import"
+	uploadURL string = apiURL + "/upload"
+	videoURL  string = apiURL + "/videos"
 )
 
 // UploadVideo uploads a video file located at filePath and returns a
@@ -33,17 +33,17 @@ func UploadVideoAuthenticated(creds Credentials, filePath string) (VideoResponse
 	return uploadVideo(creds, filePath)
 }
 
-// ImportVideoFromUrl uploads a video from a remote URL videoUrl and returns a
+// UploadVideoFromURL uploads a video from a remote URL videoURL and returns a
 // VideoResponse.
-func ImportVideoFromUrl(videoUrl string) (VideoResponse, error) {
-	return importVideoFromUrl(Credentials{}, videoUrl)
+func UploadVideoFromURL(videoURL string) (VideoResponse, error) {
+	return uploadVideoFromURL(Credentials{}, videoURL)
 }
 
-// ImportVideoFromUrlAuthenticated uploads a video from a remote URL videoUrl
+// UploadVideoFromURLAuthenticated uploads a video from a remote URL videoURL
 // with authentication using the credentials provided in creds, and returns a
 // VideoResponse.
-func ImportVideoFromUrlAuthenticated(creds Credentials, videoUrl string) (VideoResponse, error) {
-	return importVideoFromUrl(creds, videoUrl)
+func UploadVideoFromURLAuthenticated(creds Credentials, videoURL string) (VideoResponse, error) {
+	return uploadVideoFromURL(creds, videoURL)
 }
 
 // GetVideo returns a VideoResponse with information about the video with the
@@ -52,18 +52,18 @@ func GetVideo(shortcode string) (VideoResponse, error) {
 	return getVideo(Credentials{}, shortcode)
 }
 
-// GetVideo returns a VideoResponse with information about the video with the
-// short code shortcode with authentication using the credentials provides in
-// creds.
+// GetVideoAuthenticated returns a VideoResponse with information about the
+// video with the short code shortcode with authentication using the
+// credentials provides in creds.
 // This is useful to retrieve information about videos that aren't public.
 func GetVideoAuthenticated(creds Credentials, shortcode string) (VideoResponse, error) {
 	return getVideo(creds, shortcode)
 }
 
-func importVideoFromUrl(creds Credentials, videoUrl string) (VideoResponse, error) {
+func uploadVideoFromURL(creds Credentials, videoURL string) (VideoResponse, error) {
 	client := &http.Client{}
 
-	req, err := http.NewRequest("GET", getImportUrl(videoUrl), nil)
+	req, err := http.NewRequest("GET", getImportURL(videoURL), nil)
 	if err != nil {
 		return VideoResponse{}, err
 	}
@@ -89,7 +89,7 @@ func importVideoFromUrl(creds Credentials, videoUrl string) (VideoResponse, erro
 
 	body := bytesToString(bodyBytes)
 
-	videoRes, err := videoResponseFromJson(body)
+	videoRes, err := videoResponseFromJSON(body)
 	if err != nil {
 		return VideoResponse{}, err
 	}
@@ -124,7 +124,7 @@ func uploadVideo(creds Credentials, filePath string) (VideoResponse, error) {
 
 	multipartWriter.Close()
 
-	req, err := http.NewRequest("POST", uploadUrl, &buf)
+	req, err := http.NewRequest("POST", uploadURL, &buf)
 	if err != nil {
 		return VideoResponse{}, err
 	}
@@ -153,7 +153,7 @@ func uploadVideo(creds Credentials, filePath string) (VideoResponse, error) {
 
 	body := bytesToString(bodyBytes)
 
-	videoRes, err := videoResponseFromJson(body)
+	videoRes, err := videoResponseFromJSON(body)
 	if err != nil {
 		return VideoResponse{}, err
 	}
@@ -164,7 +164,7 @@ func uploadVideo(creds Credentials, filePath string) (VideoResponse, error) {
 func getVideo(creds Credentials, shortcode string) (VideoResponse, error) {
 	client := &http.Client{}
 
-	req, err := http.NewRequest("GET", getVideoUrl(shortcode), nil)
+	req, err := http.NewRequest("GET", getVideoURL(shortcode), nil)
 	if err != nil {
 		return VideoResponse{}, err
 	}
@@ -190,7 +190,7 @@ func getVideo(creds Credentials, shortcode string) (VideoResponse, error) {
 
 	body := bytesToString(bodyBytes)
 
-	videoRes, err := videoResponseFromJson(body)
+	videoRes, err := videoResponseFromJSON(body)
 	if err != nil {
 		return VideoResponse{}, err
 	}
@@ -200,22 +200,22 @@ func getVideo(creds Credentials, shortcode string) (VideoResponse, error) {
 	return videoRes, nil
 }
 
-func getImportUrl(videoUrl string) string {
-	parsedUrl, _ := url.Parse(importUrl)
-	q := parsedUrl.Query()
-	q.Set("url", videoUrl)
-	parsedUrl.RawQuery = q.Encode()
+func getImportURL(videoURL string) string {
+	parsedURL, _ := url.Parse(importURL)
+	q := parsedURL.Query()
+	q.Set("url", videoURL)
+	parsedURL.RawQuery = q.Encode()
 
-	return parsedUrl.String()
+	return parsedURL.String()
 }
 
-func getVideoUrl(shortcode string) string {
-	parsedUrl, err := url.Parse(videoUrl)
+func getVideoURL(shortcode string) string {
+	parsedURL, err := url.Parse(videoURL)
 	if err != nil {
 		return ""
 	}
 
-	parsedUrl.Path += "/" + shortcode
+	parsedURL.Path += "/" + shortcode
 
-	return parsedUrl.String()
+	return parsedURL.String()
 }

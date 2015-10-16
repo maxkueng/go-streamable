@@ -39,30 +39,30 @@ func Test_VideoResponse(t *testing.T) {
 
 	assert.Equal(t, 2, res.Status)
 	assert.Equal(t, "", res.Shortcode)
-	assert.Equal(t, "//cdn.streamable.com/video/mp4/ifjh", res.UrlRoot)
-	assert.Equal(t, "streamable.com/ifjh", res.Url)
-	assert.Equal(t, "//cdn.streamable.com/image/ifjh.jpg", res.ThumbnailUrl)
+	assert.Equal(t, "//cdn.streamable.com/video/mp4/ifjh", res.URLRoot)
+	assert.Equal(t, "streamable.com/ifjh", res.URL)
+	assert.Equal(t, "//cdn.streamable.com/image/ifjh.jpg", res.ThumbnailURL)
 	assert.Equal(t, "", res.Message)
 
 	expectedFormats := []string{"mp4", "webm"}
 	assert.Equal(t, expectedFormats, res.Formats)
 
 	expectedMp4 := VideoResponseFile{
-		Url:    "//cdn.streamable.com/video/mp4/ifjh.mp4",
+		URL:    "//cdn.streamable.com/video/mp4/ifjh.mp4",
 		Width:  848,
 		Height: 480,
 	}
 	assert.Equal(t, expectedMp4, res.Files["mp4"])
 
 	expectedWebm := VideoResponseFile{
-		Url:    "//cdn.streamable.com/video/webm/ifjh.webm",
+		URL:    "//cdn.streamable.com/video/webm/ifjh.webm",
 		Width:  848,
 		Height: 480,
 	}
 	assert.Equal(t, expectedWebm, res.Files["webm"])
 }
 
-func Test_videoResponseFromJson(t *testing.T) {
+func Test_videoResponseFromJSON(t *testing.T) {
 	jsonStr := `{
 			"status": 2,
 			"files": {
@@ -87,29 +87,29 @@ func Test_videoResponseFromJson(t *testing.T) {
 			"message": null
 		}`
 
-	res, err := videoResponseFromJson(jsonStr)
+	res, err := videoResponseFromJSON(jsonStr)
 
 	assert.Nil(t, err)
 
 	assert.Equal(t, 2, res.Status)
 	assert.Equal(t, "", res.Shortcode)
-	assert.Equal(t, "//cdn.streamable.com/video/mp4/ifjh", res.UrlRoot)
-	assert.Equal(t, "streamable.com/ifjh", res.Url)
-	assert.Equal(t, "//cdn.streamable.com/image/ifjh.jpg", res.ThumbnailUrl)
+	assert.Equal(t, "//cdn.streamable.com/video/mp4/ifjh", res.URLRoot)
+	assert.Equal(t, "streamable.com/ifjh", res.URL)
+	assert.Equal(t, "//cdn.streamable.com/image/ifjh.jpg", res.ThumbnailURL)
 	assert.Equal(t, "", res.Message)
 
 	expectedFormats := []string{"mp4", "webm"}
 	assert.Equal(t, expectedFormats, res.Formats)
 
 	expectedMp4 := VideoResponseFile{
-		Url:    "//cdn.streamable.com/video/mp4/ifjh.mp4",
+		URL:    "//cdn.streamable.com/video/mp4/ifjh.mp4",
 		Width:  848,
 		Height: 480,
 	}
 	assert.Equal(t, expectedMp4, res.Files["mp4"])
 
 	expectedWebm := VideoResponseFile{
-		Url:    "//cdn.streamable.com/video/webm/ifjh.webm",
+		URL:    "//cdn.streamable.com/video/webm/ifjh.webm",
 		Width:  848,
 		Height: 480,
 	}
