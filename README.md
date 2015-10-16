@@ -2,6 +2,7 @@ go-streamable
 =============
 
 [![Build Status](https://travis-ci.org/maxkueng/go-streamable.svg)](https://travis-ci.org/maxkueng/go-streamable)
+[![GoDoc](https://godoc.org/github.com/maxkueng/go-streamable?status.svg)](https://godoc.org/github.com/maxkueng/go-streamable)
 
 A Go client library for [streamable.com](https://streamable.com/).
 
