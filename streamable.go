@@ -98,15 +98,6 @@ func importVideoFromUrl(creds Credentials, videoUrl string) (VideoResponse, erro
 
 }
 
-func getImportUrl(videoUrl string) string {
-	parsedUrl, _ := url.Parse(importUrl)
-	q := parsedUrl.Query()
-	q.Set("url", videoUrl)
-	parsedUrl.RawQuery = q.Encode()
-
-	return parsedUrl.String()
-}
-
 func uploadVideo(creds Credentials, filePath string) (VideoResponse, error) {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return VideoResponse{}, err
@@ -207,6 +198,15 @@ func getVideo(creds Credentials, shortcode string) (VideoResponse, error) {
 	videoRes.Shortcode = shortcode
 
 	return videoRes, nil
+}
+
+func getImportUrl(videoUrl string) string {
+	parsedUrl, _ := url.Parse(importUrl)
+	q := parsedUrl.Query()
+	q.Set("url", videoUrl)
+	parsedUrl.RawQuery = q.Encode()
+
+	return parsedUrl.String()
 }
 
 func getVideoUrl(shortcode string) string {
