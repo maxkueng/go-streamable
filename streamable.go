@@ -20,27 +20,42 @@ const (
 	videoUrl  string = apiUrl + "/videos"
 )
 
-// UploadVideo uploads a video file located at filePath.
+// UploadVideo uploads a video file located at filePath and returns a
+// VideoResponse.
 func UploadVideo(filePath string) (VideoResponse, error) {
 	return uploadVideo(Credentials{}, filePath)
 }
 
+// UploadVideoAuthenticated uploads a video file located at filePath with
+// authentication using the credentials provided in creds, and returns a
+// VideoResponse.
 func UploadVideoAuthenticated(creds Credentials, filePath string) (VideoResponse, error) {
 	return uploadVideo(creds, filePath)
 }
 
+// ImportVideoFromUrl uploads a video from a remote URL videoUrl and returns a
+// VideoResponse.
 func ImportVideoFromUrl(videoUrl string) (VideoResponse, error) {
 	return importVideoFromUrl(Credentials{}, videoUrl)
 }
 
+// ImportVideoFromUrlAuthenticated uploads a video from a remote URL videoUrl
+// with authentication using the credentials provided in creds, and returns a
+// VideoResponse.
 func ImportVideoFromUrlAuthenticated(creds Credentials, videoUrl string) (VideoResponse, error) {
 	return importVideoFromUrl(creds, videoUrl)
 }
 
+// GetVideo returns a VideoResponse with information about the video with the
+// short code shortcode.
 func GetVideo(shortcode string) (VideoResponse, error) {
 	return getVideo(Credentials{}, shortcode)
 }
 
+// GetVideo returns a VideoResponse with information about the video with the
+// short code shortcode with authentication using the credentials provides in
+// creds.
+// This is useful to retrieve information about videos that aren't public.
 func GetVideoAuthenticated(creds Credentials, shortcode string) (VideoResponse, error) {
 	return getVideo(creds, shortcode)
 }
