@@ -17,6 +17,7 @@ const (
 	apiUrl    string = "https://api.streamable.com"
 	importUrl string = apiUrl + "/import"
 	uploadUrl string = apiUrl + "/upload"
+	videoUrl  string = apiUrl + "/videos"
 )
 
 // UploadVideo uploads a video file located at filePath.
@@ -34,6 +35,14 @@ func ImportVideoFromUrl(videoUrl string) (VideoResponse, error) {
 
 func ImportVideoFromUrlAuthenticated(creds Credentials, videoUrl string) (VideoResponse, error) {
 	return importVideoFromUrl(creds, videoUrl)
+}
+
+func GetVideo(shortcode string) (VideoResponse, error) {
+	return getVideo(Credentials{}, shortcode)
+}
+
+func GetVideoAuthenticated(creds Credentials, shortcode string) (VideoResponse, error) {
+	return getVideo(creds, shortcode)
 }
 
 func importVideoFromUrl(creds Credentials, videoUrl string) (VideoResponse, error) {
@@ -144,4 +153,54 @@ func uploadVideo(creds Credentials, filePath string) (VideoResponse, error) {
 	}
 
 	return videoRes, nil
+}
+
+func getVideo(creds Credentials, shortcode string) (VideoResponse, error) {
+	client := &http.Client{}
+
+	req, err := http.NewRequest("GET", getVideoUrl(shortcode), nil)
+	if err != nil {
+		return VideoResponse{}, err
+	}
+
+	if creds.Username != "" && creds.Password != "" {
+		req.SetBasicAuth(creds.Username, creds.Password)
+	}
+
+	res, err := client.Do(req)
+	defer res.Body.Close()
+	if err != nil {
+		return VideoResponse{}, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return VideoResponse{}, fmt.Errorf("not found")
+	}
+
+	bodyBytes, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return VideoResponse{}, err
+	}
+
+	body := bytesToString(bodyBytes)
+
+	videoRes, err := videoResponseFromJson(body)
+	if err != nil {
+		return VideoResponse{}, err
+	}
+
+	videoRes.Shortcode = shortcode
+
+	return videoRes, nil
+}
+
+func getVideoUrl(shortcode string) string {
+	parsedUrl, err := url.Parse(videoUrl)
+	if err != nil {
+		return ""
+	}
+
+	parsedUrl.Path += "/" + shortcode
+
+	return parsedUrl.String()
 }
