@@ -1,7 +1,6 @@
 package streamable
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"testing"
@@ -69,5 +68,4 @@ func Test_ImportVideoFromUrlAuthenticated_UsernamePassword(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 1, res.Status)
 	assert.NotEqual(t, "", res.Shortcode)
-	fmt.Printf("%v\n", res)
 }
