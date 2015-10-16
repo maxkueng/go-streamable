@@ -1,3 +1,5 @@
+// Package streamable provides functions to interact with the
+// https://streamable.com/ API.
 package streamable
 
 import (
@@ -17,6 +19,7 @@ const (
 	uploadUrl string = apiUrl + "/upload"
 )
 
+// UploadVideo uploads a video file located at filePath.
 func UploadVideo(filePath string) (VideoResponse, error) {
 	return uploadVideo(Credentials{}, filePath)
 }
