@@ -2,6 +2,7 @@ package streamable
 
 import "encoding/json"
 
+// Represents a video resource's processing status.
 const (
 	StatusUploading   = 0
 	StatusProcessing  = 1
@@ -9,6 +10,7 @@ const (
 	StatusUnavailable = 3
 )
 
+// A VideoResponse represents a video resource.
 type VideoResponse struct {
 	Status       int                          `json:"status"`
 	Shortcode    string                       `json:"shortcode"`
@@ -20,6 +22,7 @@ type VideoResponse struct {
 	Message      string                       `json:"message"`
 }
 
+// A VideoResponseFile represents a single file of a VideoResponse.
 type VideoResponseFile struct {
 	URL    string `json:"url"`
 	Width  int    `json:"width"`
