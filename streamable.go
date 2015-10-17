@@ -20,44 +20,42 @@ const (
 	videoURL  string = apiURL + "/videos"
 )
 
-// UploadVideo uploads a video file located at filePath and returns a
-// VideoInfo.
-func UploadVideo(filePath string) (VideoInfo, error) {
-	return uploadVideo(Credentials{}, filePath)
+// Client is the API client
+type Client struct {
+	creds Credentials
 }
 
-// UploadVideoAuthenticated uploads a video file located at filePath with
-// authentication using the credentials provided in creds, and returns a
+// New returns a pointer to a new Client object.
+func New() *Client {
+	return &Client{}
+}
+
+// UploadVideo uploads a video file located at filePath and returns a
 // VideoInfo.
-func UploadVideoAuthenticated(creds Credentials, filePath string) (VideoInfo, error) {
-	return uploadVideo(creds, filePath)
+func (c *Client) UploadVideo(filePath string) (VideoInfo, error) {
+	return uploadVideo(c.creds, filePath)
 }
 
 // UploadVideoFromURL uploads a video from a remote URL videoURL and returns a
 // VideoInfo.
-func UploadVideoFromURL(videoURL string) (VideoInfo, error) {
-	return uploadVideoFromURL(Credentials{}, videoURL)
-}
-
-// UploadVideoFromURLAuthenticated uploads a video from a remote URL videoURL
-// with authentication using the credentials provided in creds, and returns a
-// VideoInfo.
-func UploadVideoFromURLAuthenticated(creds Credentials, videoURL string) (VideoInfo, error) {
-	return uploadVideoFromURL(creds, videoURL)
+func (c *Client) UploadVideoFromURL(videoURL string) (VideoInfo, error) {
+	return uploadVideoFromURL(c.creds, videoURL)
 }
 
 // GetVideo returns a VideoInfo with information about the video with the short
 // code shortcode.
-func GetVideo(shortcode string) (VideoInfo, error) {
-	return getVideo(Credentials{}, shortcode)
+func (c *Client) GetVideo(shortcode string) (VideoInfo, error) {
+	return getVideo(c.creds, shortcode)
 }
 
-// GetVideoAuthenticated returns a VideoInfo with information about the video
-// with the short code shortcode with authentication using the credentials
-// provides in creds.  This is useful to retrieve information about videos that
-// aren't public.
-func GetVideoAuthenticated(creds Credentials, shortcode string) (VideoInfo, error) {
-	return getVideo(creds, shortcode)
+// SetCredentials sets credentials to mate authenticated requests.
+func (c *Client) SetCredentials(username, password string) *Client {
+	c.creds = Credentials{
+		Username: username,
+		Password: password,
+	}
+
+	return c
 }
 
 func uploadVideoFromURL(creds Credentials, videoURL string) (VideoInfo, error) {
@@ -68,9 +66,7 @@ func uploadVideoFromURL(creds Credentials, videoURL string) (VideoInfo, error) {
 		return VideoInfo{}, err
 	}
 
-	if creds.Username != "" && creds.Password != "" {
-		req.SetBasicAuth(creds.Username, creds.Password)
-	}
+	authenticateHTTPRequest(req, creds)
 
 	res, err := client.Do(req)
 	defer res.Body.Close()
@@ -129,9 +125,7 @@ func uploadVideo(creds Credentials, filePath string) (VideoInfo, error) {
 		return VideoInfo{}, err
 	}
 
-	if creds.Username != "" && creds.Password != "" {
-		req.SetBasicAuth(creds.Username, creds.Password)
-	}
+	authenticateHTTPRequest(req, creds)
 
 	req.Header.Set("Content-Type", multipartWriter.FormDataContentType())
 
@@ -169,9 +163,7 @@ func getVideo(creds Credentials, shortcode string) (VideoInfo, error) {
 		return VideoInfo{}, err
 	}
 
-	if creds.Username != "" && creds.Password != "" {
-		req.SetBasicAuth(creds.Username, creds.Password)
-	}
+	authenticateHTTPRequest(req, creds)
 
 	res, err := client.Do(req)
 	defer res.Body.Close()
