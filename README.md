@@ -12,6 +12,13 @@ An unofficial Go client library for [streamable.com](https://streamable.com/).
 $ go get github.com/maxkueng/go-streamable
 ```
 
+## Features
+
+ - Upload videos from a local file
+ - Upload videos from a remote URL
+ - Retreive information about a video
+ - Authenticated requests
+
 ## Examples
 
 Upload a video:
@@ -30,7 +37,7 @@ Upload a video with authentication:
 ```go
 func main() {
   client := streamable.New()
-  client.SetCredentials("user4", "secret")
+  client.SetCredentials("user", "secret")
 
   info, err := streamable.UploadVideoAuthenticated(creds, "selfie.mp4")
 
