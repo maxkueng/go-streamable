@@ -21,51 +21,51 @@ const (
 )
 
 // UploadVideo uploads a video file located at filePath and returns a
-// VideoResponse.
-func UploadVideo(filePath string) (VideoResponse, error) {
+// VideoInfo.
+func UploadVideo(filePath string) (VideoInfo, error) {
 	return uploadVideo(Credentials{}, filePath)
 }
 
 // UploadVideoAuthenticated uploads a video file located at filePath with
 // authentication using the credentials provided in creds, and returns a
-// VideoResponse.
-func UploadVideoAuthenticated(creds Credentials, filePath string) (VideoResponse, error) {
+// VideoInfo.
+func UploadVideoAuthenticated(creds Credentials, filePath string) (VideoInfo, error) {
 	return uploadVideo(creds, filePath)
 }
 
 // UploadVideoFromURL uploads a video from a remote URL videoURL and returns a
-// VideoResponse.
-func UploadVideoFromURL(videoURL string) (VideoResponse, error) {
+// VideoInfo.
+func UploadVideoFromURL(videoURL string) (VideoInfo, error) {
 	return uploadVideoFromURL(Credentials{}, videoURL)
 }
 
 // UploadVideoFromURLAuthenticated uploads a video from a remote URL videoURL
 // with authentication using the credentials provided in creds, and returns a
-// VideoResponse.
-func UploadVideoFromURLAuthenticated(creds Credentials, videoURL string) (VideoResponse, error) {
+// VideoInfo.
+func UploadVideoFromURLAuthenticated(creds Credentials, videoURL string) (VideoInfo, error) {
 	return uploadVideoFromURL(creds, videoURL)
 }
 
-// GetVideo returns a VideoResponse with information about the video with the
-// short code shortcode.
-func GetVideo(shortcode string) (VideoResponse, error) {
+// GetVideo returns a VideoInfo with information about the video with the short
+// code shortcode.
+func GetVideo(shortcode string) (VideoInfo, error) {
 	return getVideo(Credentials{}, shortcode)
 }
 
-// GetVideoAuthenticated returns a VideoResponse with information about the
-// video with the short code shortcode with authentication using the
-// credentials provides in creds.
-// This is useful to retrieve information about videos that aren't public.
-func GetVideoAuthenticated(creds Credentials, shortcode string) (VideoResponse, error) {
+// GetVideoAuthenticated returns a VideoInfo with information about the video
+// with the short code shortcode with authentication using the credentials
+// provides in creds.  This is useful to retrieve information about videos that
+// aren't public.
+func GetVideoAuthenticated(creds Credentials, shortcode string) (VideoInfo, error) {
 	return getVideo(creds, shortcode)
 }
 
-func uploadVideoFromURL(creds Credentials, videoURL string) (VideoResponse, error) {
+func uploadVideoFromURL(creds Credentials, videoURL string) (VideoInfo, error) {
 	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", getImportURL(videoURL), nil)
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	if creds.Username != "" && creds.Password != "" {
@@ -75,32 +75,32 @@ func uploadVideoFromURL(creds Credentials, videoURL string) (VideoResponse, erro
 	res, err := client.Do(req)
 	defer res.Body.Close()
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return VideoResponse{}, fmt.Errorf("not found")
+		return VideoInfo{}, fmt.Errorf("not found")
 	}
 
 	bodyBytes, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	body := bytesToString(bodyBytes)
 
 	videoRes, err := videoResponseFromJSON(body)
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	return videoRes, nil
 
 }
 
-func uploadVideo(creds Credentials, filePath string) (VideoResponse, error) {
+func uploadVideo(creds Credentials, filePath string) (VideoInfo, error) {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	var buf bytes.Buffer
@@ -109,24 +109,24 @@ func uploadVideo(creds Credentials, filePath string) (VideoResponse, error) {
 
 	fileHandle, err := os.Open(filePath)
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	fileWriter, err := multipartWriter.CreateFormFile("file", filePath)
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	_, err = io.Copy(fileWriter, fileHandle)
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	multipartWriter.Close()
 
 	req, err := http.NewRequest("POST", uploadURL, &buf)
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	if creds.Username != "" && creds.Password != "" {
@@ -139,34 +139,34 @@ func uploadVideo(creds Credentials, filePath string) (VideoResponse, error) {
 	res, err := client.Do(req)
 	defer res.Body.Close()
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return VideoResponse{}, fmt.Errorf("upload failed")
+		return VideoInfo{}, fmt.Errorf("upload failed")
 	}
 
 	bodyBytes, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	body := bytesToString(bodyBytes)
 
 	videoRes, err := videoResponseFromJSON(body)
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	return videoRes, nil
 }
 
-func getVideo(creds Credentials, shortcode string) (VideoResponse, error) {
+func getVideo(creds Credentials, shortcode string) (VideoInfo, error) {
 	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", getVideoURL(shortcode), nil)
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	if creds.Username != "" && creds.Password != "" {
@@ -176,23 +176,23 @@ func getVideo(creds Credentials, shortcode string) (VideoResponse, error) {
 	res, err := client.Do(req)
 	defer res.Body.Close()
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return VideoResponse{}, fmt.Errorf("not found")
+		return VideoInfo{}, fmt.Errorf("not found")
 	}
 
 	bodyBytes, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	body := bytesToString(bodyBytes)
 
 	videoRes, err := videoResponseFromJSON(body)
 	if err != nil {
-		return VideoResponse{}, err
+		return VideoInfo{}, err
 	}
 
 	videoRes.Shortcode = shortcode

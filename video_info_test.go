@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_VideoResponse(t *testing.T) {
+func Test_VideoInfo(t *testing.T) {
 	jsonStr := `{
 			"status": 2,
 			"files": {
@@ -32,7 +32,7 @@ func Test_VideoResponse(t *testing.T) {
 			"message": null
 		}`
 
-	res := VideoResponse{}
+	res := VideoInfo{}
 	err := json.Unmarshal([]byte(jsonStr), &res)
 
 	assert.Nil(t, err)
@@ -47,14 +47,14 @@ func Test_VideoResponse(t *testing.T) {
 	expectedFormats := []string{"mp4", "webm"}
 	assert.Equal(t, expectedFormats, res.Formats)
 
-	expectedMp4 := VideoResponseFile{
+	expectedMp4 := VideoInfoFile{
 		URL:    "//cdn.streamable.com/video/mp4/ifjh.mp4",
 		Width:  848,
 		Height: 480,
 	}
 	assert.Equal(t, expectedMp4, res.Files["mp4"])
 
-	expectedWebm := VideoResponseFile{
+	expectedWebm := VideoInfoFile{
 		URL:    "//cdn.streamable.com/video/webm/ifjh.webm",
 		Width:  848,
 		Height: 480,
@@ -101,14 +101,14 @@ func Test_videoResponseFromJSON(t *testing.T) {
 	expectedFormats := []string{"mp4", "webm"}
 	assert.Equal(t, expectedFormats, res.Formats)
 
-	expectedMp4 := VideoResponseFile{
+	expectedMp4 := VideoInfoFile{
 		URL:    "//cdn.streamable.com/video/mp4/ifjh.mp4",
 		Width:  848,
 		Height: 480,
 	}
 	assert.Equal(t, expectedMp4, res.Files["mp4"])
 
-	expectedWebm := VideoResponseFile{
+	expectedWebm := VideoInfoFile{
 		URL:    "//cdn.streamable.com/video/webm/ifjh.webm",
 		Width:  848,
 		Height: 480,
