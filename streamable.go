@@ -69,10 +69,10 @@ func uploadVideoFromURL(creds Credentials, videoURL string) (VideoInfo, error) {
 	authenticateHTTPRequest(req, creds)
 
 	res, err := client.Do(req)
-	defer res.Body.Close()
 	if err != nil {
 		return VideoInfo{}, err
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
 		return VideoInfo{}, fmt.Errorf("not found")
@@ -131,10 +131,10 @@ func uploadVideo(creds Credentials, filePath string) (VideoInfo, error) {
 
 	client := &http.Client{}
 	res, err := client.Do(req)
-	defer res.Body.Close()
 	if err != nil {
 		return VideoInfo{}, err
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
 		return VideoInfo{}, fmt.Errorf("upload failed")
@@ -166,10 +166,10 @@ func getVideo(creds Credentials, shortcode string) (VideoInfo, error) {
 	authenticateHTTPRequest(req, creds)
 
 	res, err := client.Do(req)
-	defer res.Body.Close()
 	if err != nil {
 		return VideoInfo{}, err
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
 		return VideoInfo{}, fmt.Errorf("not found")
