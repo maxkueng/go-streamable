@@ -22,13 +22,8 @@ func Test_VideoInfo(t *testing.T) {
 					"height": 480
 				}
 			},
-			"url_root": "//cdn.streamable.com/video/mp4/ifjh",
 			"url": "streamable.com/ifjh",
 			"thumbnail_url": "//cdn.streamable.com/image/ifjh.jpg",
-			"formats": [
-				"mp4",
-				"webm"
-			],
 			"message": null
 		}`
 
@@ -39,20 +34,19 @@ func Test_VideoInfo(t *testing.T) {
 
 	assert.Equal(t, 2, res.Status)
 	assert.Equal(t, "", res.Shortcode)
-	assert.Equal(t, "//cdn.streamable.com/video/mp4/ifjh", res.URLRoot)
 	assert.Equal(t, "streamable.com/ifjh", res.URL)
 	assert.Equal(t, "//cdn.streamable.com/image/ifjh.jpg", res.ThumbnailURL)
 	assert.Equal(t, "", res.Message)
 
-	expectedFormats := []string{"mp4", "webm"}
-	assert.Equal(t, expectedFormats, res.Formats)
-
 	expectedMp4 := VideoInfoFile{
-		URL:    "//cdn.streamable.com/video/mp4/ifjh.mp4",
+		URL:    "streamable.com/video/mp4/ifjh.mp4",
 		Width:  848,
 		Height: 480,
 	}
-	assert.Equal(t, expectedMp4, res.Files["mp4"])
+	resMp4 := res.Files["mp4"]
+	assert.Contains(t, resMp4.URL, expectedMp4.URL)
+	assert.Equal(t, resMp4.Height, expectedMp4.Height)
+	assert.Equal(t, resMp4.Width, expectedMp4.Width)
 
 	expectedWebm := VideoInfoFile{
 		URL:    "//cdn.streamable.com/video/webm/ifjh.webm",
@@ -93,20 +87,19 @@ func Test_videoResponseFromJSON(t *testing.T) {
 
 	assert.Equal(t, 2, res.Status)
 	assert.Equal(t, "", res.Shortcode)
-	assert.Equal(t, "//cdn.streamable.com/video/mp4/ifjh", res.URLRoot)
 	assert.Equal(t, "streamable.com/ifjh", res.URL)
-	assert.Equal(t, "//cdn.streamable.com/image/ifjh.jpg", res.ThumbnailURL)
+	assert.Contains(t, "//cdn.streamable.com/image/ifjh.jpg", res.ThumbnailURL)
 	assert.Equal(t, "", res.Message)
-
-	expectedFormats := []string{"mp4", "webm"}
-	assert.Equal(t, expectedFormats, res.Formats)
 
 	expectedMp4 := VideoInfoFile{
 		URL:    "//cdn.streamable.com/video/mp4/ifjh.mp4",
 		Width:  848,
 		Height: 480,
 	}
-	assert.Equal(t, expectedMp4, res.Files["mp4"])
+	resMp4 := res.Files["mp4"]
+	assert.Contains(t, resMp4.URL, expectedMp4.URL)
+	assert.Equal(t, expectedMp4.Height, resMp4.Height)
+	assert.Equal(t, expectedMp4.Width, resMp4.Width)
 
 	expectedWebm := VideoInfoFile{
 		URL:    "//cdn.streamable.com/video/webm/ifjh.webm",
