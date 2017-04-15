@@ -1,6 +1,7 @@
 package streamable
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"testing"
@@ -24,7 +25,9 @@ func Test_UploadVideoWithProgress(t *testing.T) {
 	testFile := path.Join(testFilesDir, "cat-video.mp4")
 
 	c := New()
-	res, err := c.UploadVideoWithProgress(testFile)
+	res, err := c.UploadVideoWithProgress(testFile, func(p *ProgressInfo) {
+		fmt.Printf("%#v	\n", p)
+	})
 
 	assert.Nil(t, err)
 	assert.NotZero(t, res)

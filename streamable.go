@@ -12,8 +12,6 @@ import (
 	"net/url"
 	"os"
 	"time"
-
-	"github.com/cheggaaa/pb"
 )
 
 const (
@@ -36,12 +34,12 @@ func New() *Client {
 // UploadVideo uploads a video file located at filePath and returns a
 // VideoInfo.
 func (c *Client) UploadVideo(filePath string) (VideoInfo, error) {
-	return uploadVideo(c.creds, filePath, false)
+	return uploadVideo(c.creds, filePath, nil)
 }
 
 // UploadVideoWithProgress is some as UploadVideo but show pregressbar
-func (c *Client) UploadVideoWithProgress(filePath string) (VideoInfo, error) {
-	return uploadVideo(c.creds, filePath, true)
+func (c *Client) UploadVideoWithProgress(filePath string, cb func(*ProgressInfo)) (VideoInfo, error) {
+	return uploadVideo(c.creds, filePath, cb)
 }
 
 // UploadVideoFromURL uploads a video from a remote URL videoURL and returns a
@@ -110,12 +108,12 @@ func contentLength(fileSize int64, path string) int64 {
 	return int64(buf.Len()) + fileSize
 }
 
-func uploadVideo(creds Credentials, filePath string, showProgress bool) (VideoInfo, error) {
+func uploadVideo(creds Credentials, filePath string, progressCb func(*ProgressInfo)) (VideoInfo, error) {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return VideoInfo{}, err
 	}
 
-	var bar *pb.ProgressBar
+	progressInfo := &ProgressInfo{}
 
 	fileHandle, err := os.Open(filePath)
 	if err != nil {
@@ -125,11 +123,7 @@ func uploadVideo(creds Credentials, filePath string, showProgress bool) (VideoIn
 	pipeReader, pipeWriter := io.Pipe()
 	multipartWriter := multipart.NewWriter(pipeWriter)
 	stat, _ := fileHandle.Stat()
-
-	if showProgress {
-		bar = pb.New64(stat.Size()).SetUnits(pb.U_BYTES).SetRefreshRate(time.Millisecond)
-		bar.Start()
-	}
+	progressInfo.UploadFileSize = int(stat.Size())
 
 	go func() {
 		defer pipeWriter.Close()
@@ -139,9 +133,17 @@ func uploadVideo(creds Credentials, filePath string, showProgress bool) (VideoIn
 			fmt.Fprintln(os.Stderr, err.Error())
 			return
 		}
-		if showProgress {
-			fileWriter = io.MultiWriter(fileWriter, bar)
+		fileWriter = io.MultiWriter(fileWriter, progressInfo)
+
+		if progressCb != nil {
+			go func() {
+				for {
+					progressCb(progressInfo)
+					time.Sleep(time.Millisecond)
+				}
+			}()
 		}
+
 		_, err = io.Copy(fileWriter, fileHandle)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
