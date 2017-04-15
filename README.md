@@ -42,7 +42,7 @@ func main() {
   client := streamable.New()
   client.SetCredentials("user", "secret")
 
-  info, err := streamable.UploadVideo("selfie.mp4")
+  info, err := client.UploadVideo("selfie.mp4")
   if err != nil {
     panic(err)
   }
