@@ -27,7 +27,10 @@ Upload a video:
 func main() {
   client := streamable.New()
   info, err := client.UploadVideo("selfie.mp4")
-
+  if err != nil {
+    panic(err)
+  }
+  
   fmt.Printf("%s\n", info.Shortcode);
 }
 ```
@@ -39,7 +42,10 @@ func main() {
   client := streamable.New()
   client.SetCredentials("user", "secret")
 
-  info, err := streamable.UploadVideoAuthenticated(creds, "selfie.mp4")
+  info, err := streamable.UploadVideo("selfie.mp4")
+  if err != nil {
+    panic(err)
+  }
 
   fmt.Printf("%s\n", info.Shortcode);
 }
@@ -53,6 +59,9 @@ func main() {
 
   client := streamable.New()
   info, err := client.UploadVideoFromURL(videoURL)
+  if err != nil {
+    panic(err)
+  }
 
   fmt.Printf("%s\n", info.Shortcode);
 }
@@ -65,9 +74,12 @@ func main() {
   shortcode := "ifjh"
 
   client := streamable.New()
-  info, err := streamable.GetVideo(shortcode)
+  info, err := client.GetVideo(shortcode)
+  if err != nil {
+    panic(err)
+  }
 
-  fmt.Printf("%s\n", info.ThumbnailURL);
+  fmt.Printf("%s\n", info.ThumbnailURL)
 }
 ```
 
