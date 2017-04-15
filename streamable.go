@@ -11,6 +11,9 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
+
+	"github.com/cheggaaa/pb"
 )
 
 const (
@@ -33,7 +36,12 @@ func New() *Client {
 // UploadVideo uploads a video file located at filePath and returns a
 // VideoInfo.
 func (c *Client) UploadVideo(filePath string) (VideoInfo, error) {
-	return uploadVideo(c.creds, filePath)
+	return uploadVideo(c.creds, filePath, false)
+}
+
+// UploadVideoWithProgress is some as UploadVideo but show pregressbar
+func (c *Client) UploadVideoWithProgress(filePath string) (VideoInfo, error) {
+	return uploadVideo(c.creds, filePath, true)
 }
 
 // UploadVideoFromURL uploads a video from a remote URL videoURL and returns a
@@ -102,10 +110,12 @@ func contentLength(fileSize int64, path string) int64 {
 	return int64(buf.Len()) + fileSize
 }
 
-func uploadVideo(creds Credentials, filePath string) (VideoInfo, error) {
+func uploadVideo(creds Credentials, filePath string, showProgress bool) (VideoInfo, error) {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return VideoInfo{}, err
 	}
+
+	var bar *pb.ProgressBar
 
 	fileHandle, err := os.Open(filePath)
 	if err != nil {
@@ -116,6 +126,11 @@ func uploadVideo(creds Credentials, filePath string) (VideoInfo, error) {
 	multipartWriter := multipart.NewWriter(pipeWriter)
 	stat, _ := fileHandle.Stat()
 
+	if showProgress {
+		bar = pb.New64(stat.Size()).SetUnits(pb.U_BYTES).SetRefreshRate(time.Millisecond)
+		bar.Start()
+	}
+
 	go func() {
 		defer pipeWriter.Close()
 
@@ -124,7 +139,9 @@ func uploadVideo(creds Credentials, filePath string) (VideoInfo, error) {
 			fmt.Fprintln(os.Stderr, err.Error())
 			return
 		}
-
+		if showProgress {
+			fileWriter = io.MultiWriter(fileWriter, bar)
+		}
 		_, err = io.Copy(fileWriter, fileHandle)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())

@@ -20,6 +20,16 @@ func Test_UploadVideo(t *testing.T) {
 	assert.NotZero(t, res)
 }
 
+func Test_UploadVideoWithProgress(t *testing.T) {
+	testFile := path.Join(testFilesDir, "cat-video.mp4")
+
+	c := New()
+	res, err := c.UploadVideoWithProgress(testFile)
+
+	assert.Nil(t, err)
+	assert.NotZero(t, res)
+}
+
 func Test_UploadVideo_NonExistentFile(t *testing.T) {
 	testFile := path.Join(testFilesDir, "not-exists.mp4")
 
