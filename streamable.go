@@ -94,33 +94,51 @@ func uploadVideoFromURL(creds Credentials, videoURL string) (VideoInfo, error) {
 
 }
 
+func contentLength(fileSize int64, path string) int64 {
+	var buf bytes.Buffer
+	multipartWriter := multipart.NewWriter(&buf)
+	multipartWriter.CreateFormFile("file", path)
+	multipartWriter.Close()
+	return int64(buf.Len()) + fileSize
+}
+
 func uploadVideo(creds Credentials, filePath string) (VideoInfo, error) {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return VideoInfo{}, err
 	}
 
-	var buf bytes.Buffer
-
-	multipartWriter := multipart.NewWriter(&buf)
-
 	fileHandle, err := os.Open(filePath)
 	if err != nil {
-		return VideoInfo{}, err
+		fmt.Fprintln(os.Stderr, err.Error())
 	}
 
-	fileWriter, err := multipartWriter.CreateFormFile("file", filePath)
-	if err != nil {
-		return VideoInfo{}, err
-	}
+	pipeReader, pipeWriter := io.Pipe()
+	multipartWriter := multipart.NewWriter(pipeWriter)
+	stat, _ := fileHandle.Stat()
 
-	_, err = io.Copy(fileWriter, fileHandle)
-	if err != nil {
-		return VideoInfo{}, err
-	}
+	go func() {
+		defer pipeWriter.Close()
 
-	multipartWriter.Close()
+		fileWriter, err := multipartWriter.CreateFormFile("file", filePath)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			return
+		}
 
-	req, err := http.NewRequest("POST", uploadURL, &buf)
+		_, err = io.Copy(fileWriter, fileHandle)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			return
+		}
+
+		if err := multipartWriter.Close(); err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			return
+		}
+
+	}()
+
+	req, err := http.NewRequest("POST", uploadURL, pipeReader)
 	if err != nil {
 		return VideoInfo{}, err
 	}
@@ -129,7 +147,10 @@ func uploadVideo(creds Credentials, filePath string) (VideoInfo, error) {
 
 	req.Header.Set("Content-Type", multipartWriter.FormDataContentType())
 
-	client := &http.Client{}
+	req.ContentLength = contentLength(stat.Size(), filePath)
+
+	client := http.DefaultClient
+
 	res, err := client.Do(req)
 	if err != nil {
 		return VideoInfo{}, err

@@ -46,7 +46,7 @@ func Test_UploadVideo_Authenticated_UsernamePassword(t *testing.T) {
 }
 
 func Test_UploadVideoFromURL(t *testing.T) {
-	videoURL := "https://archive.org/download/Windows7WildlifeSampleVideo/Wildlife.wmv"
+	videoURL := "http://techslides.com/demos/samples/sample.wmv"
 	c := New()
 	res, err := c.UploadVideoFromURL(videoURL)
 
@@ -80,27 +80,23 @@ func Test_GetVideo(t *testing.T) {
 
 	assert.Equal(t, 2, res.Status)
 	assert.Equal(t, "ifjh", res.Shortcode)
-	assert.Equal(t, "//cdn.streamable.com/video/mp4/ifjh", res.URLRoot)
 	assert.Equal(t, "streamable.com/ifjh", res.URL)
-	assert.Equal(t, "//cdn.streamable.com/image/ifjh.jpg", res.ThumbnailURL)
+	assert.Contains(t, res.ThumbnailURL, "streamable.com/image/ifjh.jpg")
 	assert.Equal(t, "", res.Message)
 
-	expectedFormats := []string{"mp4", "webm"}
-	assert.Equal(t, expectedFormats, res.Formats)
-
 	expectedMp4 := VideoInfoFile{
-		URL:    "//cdn.streamable.com/video/mp4/ifjh.mp4",
+		URL:    "streamable.com/video/mp4/ifjh.mp4",
 		Width:  848,
 		Height: 480,
 	}
-	assert.Equal(t, expectedMp4, res.Files["mp4"])
+	assert.Contains(t, res.Files["mp4"].URL, expectedMp4.URL)
 
 	expectedWebm := VideoInfoFile{
-		URL:    "//cdn.streamable.com/video/webm/ifjh.webm",
+		URL:    "streamable.com/video/webm/ifjh.webm",
 		Width:  848,
 		Height: 480,
 	}
-	assert.Equal(t, expectedWebm, res.Files["webm"])
+	assert.Contains(t, res.Files["webm"].URL, expectedWebm.URL)
 }
 
 func Test_GetVideo_Authenticated_UsernamePassword(t *testing.T) {
@@ -117,9 +113,8 @@ func Test_GetVideo_Authenticated_UsernamePassword(t *testing.T) {
 
 	assert.Equal(t, 2, res.Status)
 	assert.Equal(t, "ifjh", res.Shortcode)
-	assert.Equal(t, "//cdn.streamable.com/video/mp4/ifjh", res.URLRoot)
 	assert.Equal(t, "streamable.com/ifjh", res.URL)
-	assert.Equal(t, "//cdn.streamable.com/image/ifjh.jpg", res.ThumbnailURL)
+	assert.Contains(t, "streamable.com/image/ifjh.jpg", res.ThumbnailURL)
 	assert.Equal(t, "", res.Message)
 }
 

@@ -14,11 +14,9 @@ const (
 type VideoInfo struct {
 	Status       int                      `json:"status"`
 	Shortcode    string                   `json:"shortcode"`
-	URLRoot      string                   `json:"url_root"`
 	URL          string                   `json:"url"`
 	ThumbnailURL string                   `json:"thumbnail_url"`
 	Files        map[string]VideoInfoFile `json:"files"`
-	Formats      []string                 `json:"formats"`
 	Message      string                   `json:"message"`
 }
 
