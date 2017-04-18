@@ -39,7 +39,7 @@ func videoResponseFromJSON(jsonStr string) (VideoInfo, error) {
 
 // ProgressInfo represents a file upload progress
 type ProgressInfo struct {
-	UploadPersent    float32
+	UploadPercent    float32
 	UploadTotalBytes int
 	UploadFileSize   int
 }
@@ -47,7 +47,7 @@ type ProgressInfo struct {
 func (p *ProgressInfo) Write(b []byte) (n int, err error) {
 	p.UploadTotalBytes += len(b)
 	if p.UploadFileSize > 0 {
-		p.UploadPersent = float32(p.UploadTotalBytes) / float32(p.UploadFileSize)
+		p.UploadPercent = float32(p.UploadTotalBytes) / float32(p.UploadFileSize)
 	}
 	return len(b), nil
 }
